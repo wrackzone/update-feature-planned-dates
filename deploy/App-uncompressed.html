@@ -26,7 +26,6 @@ Ext.define('CustomApp', {
         this.rallyFunctions.readRallyItems().then( {
         	success : function(bundle) {
 	            app.bundle = bundle;
-    	        console.log("app.bundle",bundle);
     	        var filter = app._createReleaseFilter();
 
     	        Ext.create('Rally.data.wsapi.TreeStoreBuilder').build({
@@ -49,7 +48,6 @@ Ext.define('CustomApp', {
     		return Rally.util.DateTime.fromIsoString(release.raw["ReleaseStartDate"]) <= today
     		&& Rally.util.DateTime.fromIsoString(release.raw["ReleaseDate"]) >= today ;
     	})
-    	console.log("releases",releases.length);
     	_.each(releases,function(r,i){
     		var f = Ext.create('Rally.data.wsapi.Filter', {
 		    	property: 'Release',
@@ -58,7 +56,6 @@ Ext.define('CustomApp', {
      		})
      		filter = i == 0 ? f : filter.or(f)
     	});
-    	console.log(filter.toString());
     	return filter;
     },
 
@@ -73,37 +70,53 @@ Ext.define('CustomApp', {
 	        context: app.getContext(),
 	        enableEditing: false,
 	        enableBulkEdit: false,
-	        shouldShowRowActionsColumn: false,
+	        shouldShowRowActionsColumn: true,
 	        enableRanking: false,
 	        columnCfgs: [
 	            'Name',
 	            'Owner',
+	            'Project',
+	            'Release',
+	            'Iteration',
 	            'PlannedStartDate',
 	            'PlannedEndDate',
 	            'LeafStoryCount',
-	            'Release',
-	            'Iteration',
 	            {
-	            	header : 'Unplanned Stories',   
+	            	header : 'Planned / Unplanned Count',   
                 	dataIndex : 'Parent', 
                 	width : 50,
                 	hidden : false,
                 	renderer : app.renderCustomColumn
 	            },
 	            {
+	            	header : '% Planned',   
+                	dataIndex : 'Parent', 
+                	width : 50,
+                	hidden : false,
+                	renderer : app.renderPercentPlanned
+	            },
+
+	            {
 	            	header : 'Earliest Planned',   
                 	dataIndex : 'Parent', 
                 	width : 75,
                 	hidden : false,
-                	renderer : app.renderPlannedDate
+                	renderer : app.renderEarliestDate
 	            },
 	            {
 	            	header : 'Latest Planned',   
                 	dataIndex : 'Parent', 
                 	width : 75,
                 	hidden : false,
-                	renderer : app.renderPlannedDate
+                	renderer : app.renderLatestDate
 	            }
+	            // {
+	            // 	header : 'Update',   
+             //    	dataIndex : 'Parent', 
+             //    	width : 75,
+             //    	hidden : false,
+             //    	renderer : app.renderUpdateButton
+	            // },
 	        ]
 	    });
     },
@@ -131,34 +144,93 @@ Ext.define('CustomApp', {
 
     },
 
-    renderPlannedDate : function(value,id,r,a,colIndex,c) {
+    calcPercentPlanned : function(planned,rec) {
 
-    	if (colIndex==9)
-    		value = r.get("Earliest");
-    	else
-    		value = r.get("Latest");
+    	var lsc = rec.get("LeafStoryCount") || 0;
+		var pp = (lsc > 0 && planned.length > 0) ? ((planned.length / lsc) * 100) : 0
+		// console.log("calc:",rec.get("FormattedID"),planned.length,lsc,pp);
+		return Math.round(pp);
 
+    },
+
+    renderUpdateButton : function(value,meta,rec) {
+    
+    	var val = rec.get("Button");
+
+    	if (!_.isUndefined(val))
+    		return val;
+    	// if (rec.get("Button")==true)
+    	// 	return;
+        var id = Ext.id();
+        Ext.defer(function () {
+            Ext.widget('button', {
+                renderTo: id,
+                text: 'Update',
+                width: 75,
+                handler: function () { 
+                	console.log('Info', rec.get('Name')); 
+                }
+            });
+        }, 50);
+        var val = Ext.String.format('<div id="{0}"></div>', id);
+        rec.set("Button",val);
+        return val;
+    },
+
+    renderPercentPlanned : function(value,meta,rec) {
+
+    	if (_.isUndefined(rec.get("PercentPlanned"))) {
+    		return "..."
+    	} else {
+    		return rec.get("PercentPlanned");
+    	}
+    },
+
+    renderEarliestDate : function(value,meta,r,a,colIndex,c) {
+		value = r.get("Earliest");
     	if (_.isUndefined(value)) {
     		return "..."
     	} else {
+			var diff = Rally.util.DateTime.getDifference(value,r.get("PlannedStartDate"),'day');
+			if (Math.abs(diff) > 0 ) {
+				meta.style = "background-color:LemonChiffon;";
+			}
     		return value.toISOString().slice(0, 10);;
     	}
     },
 
+    renderLatestDate : function(value,meta,r,a,colIndex,c) {
+		value = r.get("Latest");
+    	if (_.isUndefined(value)) {
+    		return "..."
+    	} else {
+			var diff = Rally.util.DateTime.getDifference(value,r.get("PlannedEndDate"),'day');
+			// console.log("Diff",value,r.get("PlannedEndDate"),r.get("FormattedID"),diff);
+			if (Math.abs(diff) > 0 ) {
+				meta.style = "background-color:LemonChiffon;";
+			}   
+    		return value.toISOString().slice(0, 10);;
+    	}
+    },
 
-
-    renderCustomColumn : function(value,id,r) {
+    renderCustomColumn : function(value,meta,r) {
       	
-      	// console.log('r',r,r.get("_type"));
       	if (r.get("_type")=="portfolioitem/feature") {
       		var up =  r.get("Unplanned");
       		var p = r.get("Planned");
-      		if (_.isUndefined(up)) {
+      		if (_.isUndefined(up)||_.isUndefined(p)) {
       			var itemId = Ext.id();
 		        Ext.defer(app.readStories,500, app, [value,itemId,r]);
 		        return('...');
       		} else {
-      			return ""+up.length+ "/" + (!_.isUndefined(p) ? r.get("Planned").length : 0);
+      			if (p.length == 0 && up.length > 0) {
+			    	meta.style = "background-color:tomato;";
+      			}
+      			if (p.length > 0 && up.length == 0) {
+			    	meta.style = "background-color:LightGreen;";
+      			}
+
+      			return ""+p.length+ " / " + (!_.isUndefined(p) ? up.length : 0);
       		}
       	}
   		return "-";
@@ -166,9 +238,8 @@ Ext.define('CustomApp', {
 	},
 
 	unplannedStories : function(list) {
-		// console.log("list",list,list.length);
+
 		var filteredList = _.filter(list,function(rec) {
-					// console.log(rec.get("_type"),rec.get("Children"));
 					return rec.get("_type") == "hierarchicalrequirement" &&
 						rec.get("Children").Count == 0 &&
 					(_.isNull(rec.get("Iteration")) || _.isUndefined(rec.get("Iteration")))
@@ -177,9 +248,7 @@ Ext.define('CustomApp', {
 	},
 
 	plannedStories : function(list) {
-		// console.log("list",list,list.length);
 		var filteredList = _.filter(list,function(rec) {
-					// console.log(rec.get("_type"),rec.get("Children"));
 					return rec.get("_type") == "hierarchicalrequirement" &&
 						rec.get("Children").Count == 0 &&
 					(!(_.isNull(rec.get("Iteration")) || _.isUndefined(rec.get("Iteration"))))
@@ -189,7 +258,6 @@ Ext.define('CustomApp', {
 
 
 	readStories : function(value,itemId,rec) {
-		// console.log("readstories",value,itemId,rec)
 
 		this.rallyFunctions.recurseObject(rec) .then({
 			success : function(list) {
@@ -201,6 +269,7 @@ Ext.define('CustomApp', {
 				var elDates = app.calcEarliestAndLatest(planned);
 				rec.set("Earliest", elDates.earliest);
 				rec.set("Latest",elDates.latest);
+				rec.set("PercentPlanned", app.calcPercentPlanned(planned,rec));
 			}
 		}
 		)
