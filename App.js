@@ -61,7 +61,7 @@ Ext.define('CustomApp', {
 	        context: app.getContext(),
 	        enableEditing: false,
 	        enableBulkEdit: false,
-	        shouldShowRowActionsColumn: true,
+	        shouldShowRowActionsColumn: false,
 	        enableRanking: false,
 	        columnCfgs: [
 	            'Name',
