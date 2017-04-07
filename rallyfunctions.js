@@ -489,7 +489,7 @@ Ext.define("RallyFunctions", function() {
                 // console.log(root.get("FormattedID"),stack);
                 list.push(root); stack = stack - 1;
 
-                _.each(["Children","UserStories","Tasks","Defects","TestCases"],function(collection){ 
+                _.each(["Children","UserStories"/*,"Tasks","Defects","TestCases"*/],function(collection){ 
                     childItems(root,collection, function(records){
                         _.each(records,function(record) {
                             walk(record);

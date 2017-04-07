@@ -3,12 +3,13 @@ var app = null;
 Ext.define('CustomApp', {
     extend: 'Rally.app.App',
     componentCls: 'app',
-    items:{ html:'<a href="https://help.rallydev.com/apps/2.0rc2/doc/">App SDK 2.0rc2 Docs</a>'},
+    // items:{ html:'<a href="https://help.rallydev.com/apps/2.0rc2/doc/">App SDK 2.0rc2 Docs</a>'},
     launch: function() {
 
     	app = this;
 
 
+    	app.showMask("Loading configuration data...");
         this.rallyFunctions = Ext.create("RallyFunctions",{ 
             ctx : this.getContext(),
         	keys : ['iterations','releases']
@@ -19,6 +20,7 @@ Ext.define('CustomApp', {
 	            app.bundle = bundle;
     	        var filter = app._createReleaseFilter();
 
+    	        app.showMask("Loading features...");
     	        Ext.create('Rally.data.wsapi.TreeStoreBuilder').build({
 				    models: ['portfolioitem/feature'],
 				    autoLoad: true,
@@ -54,7 +56,7 @@ Ext.define('CustomApp', {
 		console.log("_onStoreBuilt");
 		app.earliestIndex = 9;
 		app.latestIndex = 10;
-
+		app.hideMask();
 	    app.add({
 	        xtype: 'rallytreegrid',
 	        store: store,
@@ -264,6 +266,15 @@ Ext.define('CustomApp', {
 			}
 		}
 		)
-	}
+	},
+	showMask: function(msg) {
+        if ( this.getEl() ) { 
+            this.getEl().unmask();
+            this.getEl().mask(msg);
+        }
+    },
+    hideMask: function() {
+        this.getEl().unmask();
+    }
 
 });
