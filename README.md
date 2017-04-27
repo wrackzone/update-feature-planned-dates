@@ -3,7 +3,7 @@ update-feature-planned-dates
 
 ## Overview
 
-Barry Mullan (CA Technologies)
+Barry Mullan / Eric Willeke (CA Technologies)
 
 This view will be useful for PI or Release planning events. It shows all Features in a release with columns to show the planning status of child stories.
 
@@ -15,16 +15,16 @@ The first number is the total number of stories that have been planned into an i
 
 **Green** means that all stories for this feature have been planned.
 
-**% Planned**
+### **% Planned**
 The percentage of total stories that have been planned.
 
-**Earliest Planned**
+### **Earliest Planned**
 The start date of the earliest iteration that stories have been planned into.
 
-**Latest Planned**
+### **Latest Planned**
 The end date of the latest iteration that stories have been planned into.
 
-**Arrow Action Button**
+### **Arrow Action Button**
 Clicking this will set the Features planned start and end dates to be that of the earliest and latest planned dates.
 
 
