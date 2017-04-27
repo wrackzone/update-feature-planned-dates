@@ -7,12 +7,13 @@ Barry Mullan (CA Technologies)
 
 This view will be useful for PI or Release planning events. It shows all Features in a release with columns to show the planning status of child stories.
 
-**Planned / Unplanned Count**
+### **Planned / Unplanned Count**
+
 The first number is the total number of stories that have been planned into an iteration. The second is the total number of unplanned stories.
 
 **Red** means that no stories for this feature have been planned into an iteration
 
-**Green* means that all stories for this feature have been planned.
+**Green** means that all stories for this feature have been planned.
 
 **% Planned**
 The percentage of total stories that have been planned.
