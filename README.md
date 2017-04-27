@@ -7,6 +7,8 @@ Barry Mullan / Eric Willeke (CA Technologies)
 
 This view will be useful for PI or Release planning events. It shows all Features in a release with columns to show the planning status of child stories.
 
+**Important** Install this app on a Release filtered page.
+
 ### **Planned / Unplanned Count**
 
 The first number is the total number of stories that have been planned into an iteration. The second is the total number of unplanned stories.
