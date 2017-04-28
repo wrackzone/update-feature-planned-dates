@@ -105,10 +105,10 @@ Ext.define('CustomApp', {
 	            'Release',
 	            'Iteration',
 	            { dataIndex : 'PlannedStartDate',
-                    renderer : function(value) { return value ? value.toLocaleDateString() : "";}
+                    renderer : function(value) { return value ? value.toLocaleDateString() : null;}
                 },
 	            { dataIndex : 'PlannedEndDate',
-                    renderer : function(value) { return value ? value.toLocaleDateString() : "";}
+                    renderer : function(value) { return value ? value.toLocaleDateString() : null;}
                 },
 	            'LeafStoryCount',
 	            {
@@ -201,27 +201,36 @@ Ext.define('CustomApp', {
 
     renderEarliestDate : function(value,meta,r,a,colIndex,c) {
 		value = r.get("Earliest");
-    	if (_.isUndefined(value)) {
+    	if (!(value)) {
     		return "..."
     	} else {
-			var diff = Rally.util.DateTime.getDifference(value,r.get("PlannedStartDate"),'day');
-			if (Math.abs(diff) > 0 ) {
-				meta.style = "background-color:LemonChiffon;";
-			}
-    		return value.toLocaleDateString(); 
+            // console.log("psd",r.get("PlannedStartDate"));
+            if (r.get("PlannedStartDate")) {
+    			var diff = Rally.util.DateTime.getDifference(value,r.get("PlannedStartDate"),'day');
+    			if (Math.abs(diff) > 0 ) {
+    				meta.style = "background-color:LemonChiffon;";
+    			}
+        		return value.toLocaleDateString(); 
+            } else {
+                return "";
+            }
     	}
     },
 
     renderLatestDate : function(value,meta,r,a,colIndex,c) {
 		value = r.get("Latest");
-    	if (_.isUndefined(value)) {
+    	if (!(value)) {
     		return "..."
     	} else {
-			var diff = Rally.util.DateTime.getDifference(value,r.get("PlannedEndDate"),'day');
-			if (Math.abs(diff) > 0 ) {
-				meta.style = "background-color:LemonChiffon;";
-			}   
-    		return value.toLocaleDateString(); 
+            if (r.get("PlannedEndDate")) {
+    			var diff = Rally.util.DateTime.getDifference(value,r.get("PlannedEndDate"),'day');
+    			if (Math.abs(diff) > 0 ) {
+    				meta.style = "background-color:LemonChiffon;";
+    			}   
+        		return value.toLocaleDateString(); 
+            } else {
+                return "";
+            }
     	}
     },
 
@@ -274,6 +283,7 @@ Ext.define('CustomApp', {
 		this.rallyFunctions.recurseObject(rec) .then({
 			success : function(list) {
 				// filter to just stories which have no iteration
+                console.log("list",list);
 				var unplanned = app.unplannedStories(list);
 				var planned = app.plannedStories(list);
 				rec.set("Unplanned",unplanned);
