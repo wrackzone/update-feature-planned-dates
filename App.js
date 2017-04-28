@@ -274,7 +274,6 @@ Ext.define('CustomApp', {
 		this.rallyFunctions.recurseObject(rec) .then({
 			success : function(list) {
 				// filter to just stories which have no iteration
-                console.log("list",list);
 				var unplanned = app.unplannedStories(list);
 				var planned = app.plannedStories(list);
 				rec.set("Unplanned",unplanned);
