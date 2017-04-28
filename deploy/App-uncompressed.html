@@ -24,30 +24,42 @@ Ext.define('CustomApp', {
     	app = this;
 
     	app.showMask("Loading configuration data...");
-        this.rallyFunctions = Ext.create("RallyFunctions",{ 
-            ctx : this.getContext(),
-        	keys : ['iterations','releases']
-        });
 
-        this.rallyFunctions.readRallyItems().then( {
-        	success : function(bundle) {
-	            app.bundle = bundle;
-    	        var filter = app._createReleaseFilter(scope);
-
-                if (filter) {
-        	        app.showMask("Loading features...");
-        	        Ext.create('Rally.data.wsapi.TreeStoreBuilder').build({
-    				    models: ['portfolioitem/feature'],
-    				    autoLoad: true,
-    				    enableHierarchy: true,
-    				    filters : [filter]
-    				}).then({
-    				    success: app._onStoreBuilt,
-    				    scope: app
-    				});
+        if (!app.bundle) {
+            this.rallyFunctions = Ext.create("RallyFunctions",{ 
+                ctx : this.getContext(),
+                keys : ['iterations','releases','piTypes']
+            });
+            this.rallyFunctions.readRallyItems().then( {
+                success : function(bundle) {
+                    app.bundle = bundle;
+                    console.log("bundle",app.bundle);
+                    app._createGrid(scope);
                 }
-        	}
-        });
+            });
+        } else {
+            app._createGrid(scope);
+        }
+    },
+
+    _createGrid : function(scope) {
+
+        var filter = app._createReleaseFilter(scope);
+
+        if (filter) {
+            app.showMask("Loading features...");
+            Ext.create('Rally.data.wsapi.TreeStoreBuilder').build({
+                // models: ['portfolioitem/feature'],
+                models: [_.first(app.bundle.piTypes).get("TypePath")],
+                autoLoad: true,
+                enableHierarchy: true,
+                filters : [filter]
+            }).then({
+                success: app._onStoreBuilt,
+                scope: app
+            });
+        }
+
 
     },
 
