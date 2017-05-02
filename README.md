@@ -13,7 +13,6 @@ This view will be useful for PI or Release planning events. It shows all Feature
 
 Column | Description
 ------ | -----------
-
 ### **Planned / Unplanned Count** | The first number is the total number of stories that have been planned into an iteration. The second is the total number of unplanned stories.
 
 
