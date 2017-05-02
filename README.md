@@ -11,9 +11,12 @@ This view will be useful for PI or Release planning events. It shows all Feature
 
 **Important** Install this app on a Release filtered page.
 
-### **Planned / Unplanned Count**
+Column | Description
+------ | -----------
 
-The first number is the total number of stories that have been planned into an iteration. The second is the total number of unplanned stories.
+### **Planned / Unplanned Count** | The first number is the total number of stories that have been planned into an iteration. The second is the total number of unplanned stories.
+
+
 
 **Red** means that no stories for this feature have been planned into an iteration
 
