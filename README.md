@@ -5,7 +5,14 @@ update-feature-planned-dates
 
 Barry Mullan / Eric Willeke (CA Technologies)
 
-This view will be useful for PI or Release planning events. It shows all Features in a release with columns to show the planning status of child stories.
+This tool will be useful for reviewing your plan for a Program Increment (SAFE) or release. It helps answer the questions ...
+
+* How well planned are the features ?
+* Did I miss any features ?
+* What features are fully planned ?
+* For features that are not fully planned, how many stories remain to be planned ?
+
+In addition it allows you to conveniently update the features Plannded Start/End dates based on the planned dates of it's stories. 
 
 ![screenshot](https://github.com/wrackzone/update-feature-planned-dates/blob/master/screenshot-2.png?raw=true)
 
