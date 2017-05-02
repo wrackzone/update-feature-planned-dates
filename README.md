@@ -14,12 +14,8 @@ This view will be useful for PI or Release planning events. It shows all Feature
 Column | Description
 ------ | -----------
 **Planned / Unplanned Count** | The first number is the total number of stories that have been planned into an iteration. The second is the total number of unplanned stories.
-
-
-
-**Red** means that no stories for this feature have been planned into an iteration
-
-**Green** means that all stories for this feature have been planned.
+| **Red** means that no stories for this feature have been planned into an iteration
+| **Green** means that all stories for this feature have been planned.
 
 ### **% Planned**
 The percentage of total stories that have been planned.
