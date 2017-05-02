@@ -7,6 +7,8 @@ Barry Mullan / Eric Willeke (CA Technologies)
 
 This view will be useful for PI or Release planning events. It shows all Features in a release with columns to show the planning status of child stories.
 
+![screenshot](https://github.com/wrackzone/update-feature-planned-dates/blob/master/screenshot-2.png?raw=true)
+
 **Important** Install this app on a Release filtered page.
 
 ### **Planned / Unplanned Count**
