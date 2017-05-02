@@ -27,12 +27,8 @@ Column | Description
 **Arrow Action Button** | Clicking this will set the Features planned start and end dates to be that of the earliest and latest planned dates.
 
 
+![screenshot](https://github.com/wrackzone/update-feature-planned-dates/blob/master/screenshot.png?raw=true)
+
 ## License
 
-AppTemplate is released under the MIT license.  See the file [LICENSE](./LICENSE) for the full text.
-
-##Documentation for SDK
-
-You can find the documentation on our help [site.](https://help.rallydev.com/apps/2.0rc2/doc/)
-
-![screenshot](https://github.com/wrackzone/update-feature-planned-dates/blob/master/screenshot.png?raw=true)
+This app is released under the MIT license.  See the file [LICENSE](./LICENSE) for the full text.
