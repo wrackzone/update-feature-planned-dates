@@ -24,7 +24,7 @@ Column | Description
 **% Planned** | The percentage of total stories that have been planned.
 **Earliest Planned** | The start date of the earliest iteration that stories have been planned into.
 **Latest Planned** | The end date of the latest iteration that stories have been planned into.
-** Leaf Story Count | This column will be highlighted in **Red** if this feature has unplanned stories which have successors
+** Leaf Story Count** | This column will be highlighted in **Red** if this feature has unplanned stories which have successors
 **Arrow Action Button** | Clicking this will set the Features planned start and end dates to be that of the earliest and latest planned dates.
 
 
