@@ -255,7 +255,8 @@ Ext.define('CustomApp', {
 
     renderCustomColumn : function(value,meta,r) {
       	
-      	if (r.get("_type")=="portfolioitem/feature") {
+      	// if (r.get("_type")=="portfolioitem/feature") {
+        if (r.get("_type") == _.first(app.bundle.piTypes).get("TypePath").toLowerCase() ) {
       		var up =  r.get("Unplanned");
       		var p = r.get("Planned");
       		if (_.isUndefined(up)||_.isUndefined(p)) {
