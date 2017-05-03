@@ -91,26 +91,34 @@ Ext.define('CustomApp', {
 	        enableRanking: false,
 	        columnCfgs: [
 	            'Name',
-	            'Owner',
+	            { dataIndex : 'Owner',width:70},
 	            'Project',
 	            'Release',
 	            'Iteration',
+                'Predecessors',
+                // {   header : "Dependencies", 
+                //     dataIndex : 'Predecessors', 
+                //     renderer : app.renderDependencies
+                // },
 	            { dataIndex : 'PlannedStartDate',
                     renderer : function(value) { return value ? value.toLocaleDateString() : null;}
                 },
 	            { dataIndex : 'PlannedEndDate',
                     renderer : function(value) { return value ? value.toLocaleDateString() : null;}
                 },
-	            'LeafStoryCount',
+                {   header : 'Leaf Story Count',
+                    dataIndex : 'LeafStoryCount', 
+                    renderer : app.renderDependencies
+                },
 	            {
 	            	header : 'Planned / Unplanned Count',   
                 	dataIndex : 'Parent', 
-                	width : 50,
+                	width : 70,
                 	hidden : false,
                 	renderer : app.renderCustomColumn
 	            },
 	            {
-	            	header : '% Planned',   
+	            	header : '% Plan',   
                 	dataIndex : 'Parent', 
                 	width : 50,
                 	hidden : false,
@@ -135,9 +143,7 @@ Ext.define('CustomApp', {
                     xtype: 'actioncolumn',
                     icon: app.img,
                     handler: function(grid, row,a,b,c) {
-                        console.log("row",grid.store.data.items[row].get("Name"));
                         var rec = grid.store.data.items[row];
-                        console.log(rec.get("Earliest"),rec.get("Latest"));
                         if(rec.get("Earliest")) 
                             rec.set("PlannedStartDate",rec.get("Earliest"));
                         if (rec.get("Latest"))
@@ -181,6 +187,20 @@ Ext.define('CustomApp', {
 
     },
 
+    renderDependencies : function(value,meta,rec) {
+
+        if (rec.get("_type") == "hierarchicalrequirement") {
+            return "";
+        } else {
+            var ups = rec.get("UnPlannedSuccessors");
+            if (ups && ups.length>0) {
+                meta.style = "background-color:tomato;";
+                return value;
+            }
+            return value;
+        }
+    },
+
     renderPercentPlanned : function(value,meta,rec) {
 
     	if (_.isUndefined(rec.get("PercentPlanned"))) {
@@ -195,7 +215,6 @@ Ext.define('CustomApp', {
     	if (!(value)) {
     		return "..."
     	} else {
-            // console.log("psd",r.get("PlannedStartDate"));
             if (r.get("PlannedStartDate")) {
     			var diff = Rally.util.DateTime.getDifference(value,r.get("PlannedStartDate"),'day');
     			if (Math.abs(diff) > 0 ) {
@@ -249,12 +268,28 @@ Ext.define('CustomApp', {
 
 	},
 
-	unplannedStories : function(list) {
+    unPlannedStory : function(story) {
+        return (_.isNull(story.get("Iteration")) || _.isUndefined(story.get("Iteration")));
+    },
 
+    unPlannedSuccessors : function(list) {
+        var filteredList = _.filter(list,function(rec) {
+            var successors = rec.get("Successors");
+            if (successors && successors.Count > 0) {
+                if (app.unPlannedStory(rec)) {
+                    return true;
+                }
+            }
+            return false;
+        })
+        return filteredList;
+    },
+
+	unplannedStories : function(list) {
 		var filteredList = _.filter(list,function(rec) {
 					return rec.get("_type") == "hierarchicalrequirement" &&
-						rec.get("Children").Count == 0 &&
-					(_.isNull(rec.get("Iteration")) || _.isUndefined(rec.get("Iteration")))
+						   rec.get("Children").Count == 0 &&
+					       app.unPlannedStory(rec)
 		});
 		return filteredList;
 	},
@@ -262,12 +297,11 @@ Ext.define('CustomApp', {
 	plannedStories : function(list) {
 		var filteredList = _.filter(list,function(rec) {
 					return rec.get("_type") == "hierarchicalrequirement" &&
-						rec.get("Children").Count == 0 &&
-					(!(_.isNull(rec.get("Iteration")) || _.isUndefined(rec.get("Iteration"))))
+						   rec.get("Children").Count == 0 &&
+					       !app.unPlannedStory(rec)
 		});
 		return filteredList;
 	},
-
 
 	readStories : function(value,itemId,rec) {
 
@@ -276,8 +310,10 @@ Ext.define('CustomApp', {
 				// filter to just stories which have no iteration
 				var unplanned = app.unplannedStories(list);
 				var planned = app.plannedStories(list);
+                var unPlannedSuccessors = app.unPlannedSuccessors(list);
 				rec.set("Unplanned",unplanned);
 				rec.set("Planned", planned);
+                rec.set("UnPlannedSuccessors",unPlannedSuccessors);
 				var elDates = app.calcEarliestAndLatest(planned);
 				rec.set("Earliest", elDates.earliest);
 				rec.set("Latest",elDates.latest);
